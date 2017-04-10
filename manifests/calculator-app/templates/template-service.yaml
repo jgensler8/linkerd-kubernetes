@@ -1,0 +1,18 @@
+{{- $root := . -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ $root.serviceName }}"
+  namespace: "{{ $root.teamName }}"
+  labels:
+    app: "{{ $root.serviceName }}"
+    environment: "{{ $root.environment }}"
+spec:
+  selector:
+    app: "{{ $root.serviceName }}"
+  type: NodePort
+  ports:
+  - name: "{{ $root.portName }}"
+    port: 80
+    targetPort: "{{ $root.portName }}"

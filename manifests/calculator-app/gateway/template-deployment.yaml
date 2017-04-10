@@ -1,0 +1,56 @@
+{{- $root := . -}}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ $root.serviceName }}"
+  namespace: "{{ $root.teamName }}"
+  labels:
+    app: "{{ $root.serviceName }}"
+    environment: "{{ $root.environment }}"
+spec:
+  replicas: {{ $root.replicas }}
+  template:
+    metadata:
+      labels:
+        app: "{{ $root.serviceName }}"
+        environment: "{{ $root.environment }}"
+    spec:
+      containers:
+      - name: "{{ $root.serviceName }}"
+        image: "{{ $root.imageRepo }}/{{ $root.imageService }}:{{ $root.imageTag }}"
+        ports:
+        - name: "{{ $root.portName }}"
+          containerPort: 8081
+        command:
+        - /a.out
+        - -v={{ $root.logLevel }}
+        - -logtostderr
+        - -port=8081
+        env:
+        - name: HTTP_PROXY
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: GATEWAY_TOKENIZERSERVICE
+          value: http://tokenizer/tokenize
+        - name: GATEWAY_ADDITIONSERVICE
+          value: http://addition-operator/operate
+        - name: GATEWAY_SUBTRACTIONSERVICE
+          value: http://subtraction-operator/operate
+        - name: GATEWAY_MULTIPLICATIONSERVICE
+          value: http://multiplication-operator/operate
+        - name: GATEWAY_DIVISIONSERVICE
+          value: http://division-operator/operate
+        # These variables would be used if we weren't using linkerd and
+        # each service was in its own namespace
+        # - name: GATEWAY_TOKENIZERSERVICE
+        #   value: http://tokenizer.team-tokenizer:80/tokenize
+        # - name: GATEWAY_ADDITIONSERVICE
+        #   value: http://addition-operator.team-addition-operator:80/operate
+        # - name: GATEWAY_SUBTRACTIONSERVICE
+        #   value: http://subtraction-operator.team-subtraction-operator:80/operate
+        # - name: GATEWAY_MULTIPLICATIONSERVICE
+        #   value: http://multiplication-operator.team-multiplication-operator:80/operate
+        # - name: GATEWAY_DIVISIONSERVICE
+        #   value: http://division-operator.team-division-operator:80/operate

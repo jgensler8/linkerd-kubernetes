@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dtab-template
+  annotations:
+    konfd.io/kind: configmap
+    konfd.io/name: dtab
+    konfd.io/key:  dtab
+  labels:
+    konfd.io/template: "true"
+data:
+  template: |
+    /svc => /#/io.l5d.k8s ;
+    /split => /#/io.l5d.k8s ;
+    {{ configmap "dtab-custom" "dtab" }}

@@ -1,0 +1,29 @@
+{{- $root := . -}}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ $root.serviceName }}"
+  namespace: "{{ $root.teamName }}"
+  labels:
+    app: "{{ $root.serviceName }}"
+    environment: "{{ $root.environment }}"
+spec:
+  replicas: {{ $root.replicas }}
+  template:
+    metadata:
+      labels:
+        app: "{{ $root.serviceName }}"
+        environment: "{{ $root.environment }}"
+    spec:
+      containers:
+      - name: "{{ $root.serviceName }}"
+        image: "{{ $root.imageRepo }}/{{ $root.imageService }}:{{ $root.imageTag }}"
+        ports:
+        - name: "{{ $root.portName }}"
+          containerPort: 8081
+        command:
+        - /a.out
+        - -v={{ $root.logLevel }}
+        - -logtostderr
+        - -port=8081
