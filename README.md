@@ -1,6 +1,6 @@
 # linkerd-kubernetes
 
-Check out the blog post [here]()
+Check out the blog post [here](https://medium.com/@jeffzzq/modeling-environments-with-linkerd-ingress-part-1-2-d6f2a8aa48c5)
 
 Most of the information was synthesized from a few linkerd articles ([link](https://blog.buoyant.io/2017/04/06/a-service-mesh-for-kubernetes-part-viii-linkerd-as-an-ingress-controller/), [link](https://blog.buoyant.io/2016/05/04/real-world-microservices-when-services-stop-playing-well-and-start-getting-real/)).
 
