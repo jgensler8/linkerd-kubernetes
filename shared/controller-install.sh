@@ -31,7 +31,7 @@ export K8S_SERVICE_IP=10.3.0.1
 export DNS_SERVICE_IP=10.3.0.10
 
 # Whether to use Calico for Kubernetes network policy.
-export USE_CALICO=true
+export USE_CALICO=false
 
 # Determines the container runtime for kubernetes to use. Accepts 'docker' or 'rkt'.
 export CONTAINER_RUNTIME=docker

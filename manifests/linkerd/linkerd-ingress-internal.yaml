@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: external-kubeconfig
+data:
+  kubeconfig: "YXBpVmVyc2lvbjogdjEKa2luZDogQ29uZmlnCmNsdXN0ZXJzOgotIGNsdXN0ZXI6CiAgICAjIGNlcnRpZmljYXRlLWF1dGhvcml0eTogc3NsL2NhLnBlbQogICAgY2VydGlmaWNhdGUtYXV0aG9yaXR5LWRhdGE6ICJMUzB0TFMxQ1JVZEpUaUJEUlZKVVNVWkpRMEZVUlMwdExTMHRDazFKU1VSSGFrTkRRV2RMWjBGM1NVSkJaMGxLUVU4elVrZEhlbVV2YW5oVlRVRXdSME5UY1VkVFNXSXpSRkZGUWtKUlZVRk5Ra2w0UlVSQlQwSm5UbFlLUWtGTlZFSXlkREZaYlZWMFdUSkZkMGhvWTA1TlZHTjNUa1JGZDAxRVJYaE9SRWt3VjJoalRrNUVVWGRQUkVreVRVUkZlRTVFU1RCWGFrRlRUVkpCZHdwRVoxbEVWbEZSUkVWM1pISmtWMHBzVEZkT2FFMUpTVUpKYWtGT1FtZHJjV2hyYVVjNWR6QkNRVkZGUmtGQlQwTkJVVGhCVFVsSlFrTm5TME5CVVVWQkNuUnlTMmQzVXpnMWIyNW9VRFJQTjJkT0wyUlhlWGhvVUVsQlNUSlJMMUEzWlhkclJVUmhhVWRKTjNGRlUyaFNhM0pZYmprcmNEUlJhV3RSUm1zMU9GY0taUzlvT0VsRFkxSXdkR0ZhUjBWdGVuUTNkVTk0YTNaa1prOVRNUzlUTXpaSlFVcE1MMFZ5ZFc1UU16UmtTR2RWUkVRNVYybzVTbEJqYzFwU1QyeFRNd3BxV1hCMFIwZExhV0YyYUVoWFJrVllZWEpwTkVKaFoyUTJiRkEzVUNzdlpHcHJPWGhNYkc0eGNVZzBjMUZIZEdSUWVUWmtVSGgwVEdGUFR6STBjWHBzQ2t0cU1tWndVVFF2VVV0M0t5OXFWVzAxVmxoclUzQlRVVGhHUTNOWFdWSlJZVGxaTTNCU1NUUnZlVnBUTDFaVU9ESnlPRXQ2Y25WeVZrOXJaREpTWVVvS05tUldaMGg1Yml0U0sxZDVlVkJRUkRSME9GZEJOWFpUYUhGMmJUbE9SMU5xTUd4aU4wdHBNSGx0U0VacWVXaHZORzlGV1RSalIzZHNlVEZZWlM5RVVnb3laVTF4TkVnM2JUVkpjVFZVVlc5cVRGRjNlbWQzU1VSQlVVRkNiek5OZDJOVVFXUkNaMDVXU0ZFMFJVWm5VVlVyUld4dlkxbE9XVlV2VVRjNVNtRTNDalpsYUZWMll6Y3lZek5qZDFGbldVUldVakJxUWtSemQwOVpRVlVyUld4dlkxbE9XVlV2VVRjNVNtRTNObVZvVlhaak56SmpNMlZvUm5GUlZVMUNTWGdLUlVSQlQwSm5UbFpDUVUxVVFqSjBNVmx0VlhSWk1rZERRMUZFZERCU2FITXpkalE0VmtSQlRVSm5UbFpJVWsxRlFsUkJSRUZSU0M5TlFUQkhRMU54UndwVFNXSXpSRkZGUWtKUlZVRkJORWxDUVZGQ1pUTlNRbkJxUlVSUFNuRnBOMlZaVUdJMGQwZzFlRFpsVms1M01YcEplV2xSY21oMWVISXpiWGh5TVZZM0NrWmFSaXN4ZHpGcFNuSmtPV2xhYVhSRk1XWjZRMUp5U1VOMVMwVndjQ3RwUkRSMlNEUjViR0ZsTjNGcFFsZzNNWHBDYkN0Rk1saElUbVpPZVVGWlJtMEtTQzlqVUhkM1drbEJkQzlpZGpGeWJXdHVkbVZXVFNzNVVVOUtkU3MzVlVKUVRGRlFaVlpHZFZOUGExUXdWblJ5VTA1Mk1GaHZTRTVUVjNoYWFYRkVZUXBzVVRWSGQwNVBVWFJ6TVRFdmJXSnBPR1pIYURGVGRVbGFaQ3RpYlhoa1R6aDVNMGR6WjNwM1UxVktORnA2WlVaYU1GTmhla2xxYnl0WlJqQlVjbHBaQ2pka1lqQnRkak55Y0dWR1RIZFRTRTlvZHpFMEsyVnVlbXczWWtwR00yZ3pjMk5WT1VsdVJUZFVOMEZ2UmxGSVNtSjBPRFZ6Y2pkQk1rRm5PVTgyTkdjS05TOXJRbmxtVFZONVNUZ3hUWEZtUTFaWU1qRjJkbXBsYlNzM05XNXZUVzUwT0RWRlVrYzNaZ290TFMwdExVVk9SQ0JEUlZKVVNVWkpRMEZVUlMwdExTMHRDZz09IgogICAgc2VydmVyOiBodHRwczovLzE3Mi4xNy40LjE5OjQ0MwogIG5hbWU6IHZhZ3JhbnQtbXVsdGktY2x1c3Rlcgpjb250ZXh0czoKLSBjb250ZXh0OgogICAgY2x1c3RlcjogdmFncmFudC1tdWx0aS1jbHVzdGVyCiAgICBuYW1lc3BhY2U6IGRlZmF1bHQKICAgIHVzZXI6IHZhZ3JhbnQtbXVsdGktYWRtaW4KICBuYW1lOiB2YWdyYW50LW11bHRpCnVzZXJzOgotIG5hbWU6IHZhZ3JhbnQtbXVsdGktYWRtaW4KICB1c2VyOgogICAgIyBjbGllbnQtY2VydGlmaWNhdGU6IHNzbC9hZG1pbi5wZW0KICAgIGNsaWVudC1jZXJ0aWZpY2F0ZS1kYXRhOiAiTFMwdExTMUNSVWRKVGlCRFJWSlVTVVpKUTBGVVJTMHRMUzB0Q2sxSlNVUk1la05EUVdobFowRjNTVUpCWjBsS1FVbGxZbGcwVlRGcGFsZzJUVUV3UjBOVGNVZFRTV0l6UkZGRlFrSlJWVUZOUWtsNFJVUkJUMEpuVGxZS1FrRk5WRUl5ZERGWmJWVjBXVEpGZDBob1kwNU5WR04zVGtSRmQwMUVSWGhPUkVreFYyaGpUazFVWjNkT1JFVjNUVVJGZUU1RVNURlhha0ZXVFZKTmR3cEZVVmxFVmxGUlJFUkJjSEprVjBwc1RGZEdhMkpYYkhWTlNVbENTV3BCVGtKbmEzRm9hMmxIT1hjd1FrRlJSVVpCUVU5RFFWRTRRVTFKU1VKRFowdERDa0ZSUlVGNmF6RXZWRW93WjFOYWNHRm9TbUp1SzNKRE1VWmlkMmxQWTA1RFUwbFVRV2RoTUZNeWFGVkthWFEwWVdSV2MyUmFhSGxUZUd0SlZFVkNNMVFLTjNFMFFpOXlUa05xY1hKWlYwMW5NRFpuVEhCRGEwMW1TbEE1SzJvMlJtVmtTRGc0U0RSUmVXOXdkRkJoUVZKclRFeEpPVW80YzFORFdYSm1iV2RGVUFwTVUyNTFVSGxSWkVsemMwTlNTbGhzZVU5SlNVNXVTbU5CUzJwTU0wMUNWelpyT0VOaVJuRmxPR296U1hCaWRFNW9Sa2xYYTNFM1pUbEtZVmgxZFZsckNrMTFVbklyZDNCU2JrVm1UbEpqYkhkd1NIUm9OSFkxUTB4RGQwNUVLMU4wVFVReFdEbElPRFV6S3pWQlpIcHlaazlFTjJwRkswTnZWazk0VTFkSlRqZ0tiREprTDB0QlIxZEdZblk1UWs1bmF6QndhbU5sVVZFNEwxVkZiVVJoUkVoaVdraHZla3RYWWxvclYzWk5WR0l4S3pRM2QyRjBWelJJWVc5RFdWcGxPQW9yYzA0eGVtSXdWRUUxUmtGT1drVmpZa0pMTmpaSWRXUTFkMGxFUVZGQlFtODBSMFZOU1VkQ1RVRnJSMEV4VldSRmQxRkRUVUZCZDBOM1dVUldVakJRQ2tKQlVVUkJaMWhuVFVkalIwRXhWV1JGVVZKblRVWTJRME50ZERGWmJWWjVZbTFXTUZwWVQwTkZiWFF4V1cxV2VXSnRWakJhV0UxMVdrZFdiVmxZVm5NS1pFbEpWMkV6Vm1sYVdFcDFXbGhTYkdONU5XdGFWMXBvWkZkNE1FeHVUakpaTkVscllUTldhVnBZU25WYVdGSnNZM2sxYTFwWFdtaGtWM2d3VEc1T01ncFplVFZxWWtoV2VtUkhWbmxNYlhoMldUSkdjMDFCTUVkRFUzRkhVMGxpTTBSUlJVSkNVVlZCUVRSSlFrRlJRVEJyZVZoSE5WaEhWakJsT0ZWUmNHaExDbGhtTlRKT1MxWlpjbGc1VDJack9YQktRakJaZGtwS1RXeGpVV2MwYUZkWlJUVlZVREZvYmtONUsxRk5PRmR5WW5Ga1FWcGxSMWxtUVZRMlRIaHJZMGNLT1hSWGVGb3plRTlrTDIxekszZE9kSGwyTXpnMFZVNDNiRE53VkhOR05sUkhkV2hwTjAxRlIzaFJiWEExU0d0dGVFWllhVU5KVW5oMlMyUllPUzl3ZWdwdWFVTlpRWFYyWkhNMmFFdHVSbXRUV0dZMVMzUkVNelppWlhnck5Ib3hTamhrYlRkbVZHbDRjbXBQTjBaSU1FRlpibkp0VVdOSU5ITjZSell6ZGt4TENrMTJTREo2ZDNCNmVrbHlSMU5qU0RkclZ6UnBXa1l2VkZwSVZrUXZhR05UWkRsWFIyaG1VMGhWU201dlUxcE1VVU5MYTJwcmFqWmpjV2sxZFhGV2FtZ0tRVFkwUmt0VVEzaERhMnRDTVd4WVN6ZHNVemhOTnlzeFNXUkVRalowZDFZNFoweFhXalJ6ZVZGT2VtcENRMFI2WWpoelZ5c3hSM1J4TlVKRlVtcHhXUW94VDBaUkNpMHRMUzB0UlU1RUlFTkZVbFJKUmtsRFFWUkZMUzB0TFMwSyIKICAgICMgY2xpZW50LWtleTogc3NsL2FkbWluLWtleS5wZW0KICAgIGNsaWVudC1rZXktZGF0YTogIkxTMHRMUzFDUlVkSlRpQlNVMEVnVUZKSlZrRlVSU0JMUlZrdExTMHRMUXBOU1VsRmIzZEpRa0ZCUzBOQlVVVkJlbXN4TDFSS01HZFRXbkJoYUVwaWJpdHlRekZHWW5kcFQyTk9RMU5KVkVGbllUQlRNbWhWU21sME5HRmtWbk5rQ2xwb2VWTjRhMGxVUlVJelZEZHhORUl2Y2s1RGFuRnlXVmROWnpBMloweHdRMnROWmtwUU9TdHFOa1psWkVnNE9FZzBVWGx2Y0hSUVlVRlNhMHhNU1RrS1NqaHpVME5aY21adFowVlFURk51ZFZCNVVXUkpjM05EVWtwWWJIbFBTVWxPYmtwalFVdHFURE5OUWxjMmF6aERZa1p4WlRocU0wbHdZblJPYUVaSlZ3cHJjVGRsT1VwaFdIVjFXV3ROZFZKeUszZHdVbTVGWms1U1kyeDNjRWgwYURSMk5VTk1RM2RPUkN0VGRFMUVNVmc1U0RnMU15czFRV1I2Y21aUFJEZHFDa1VyUTI5V1QzaFRWMGxPT0d3eVpDOUxRVWRYUm1KMk9VSk9aMnN3Y0dwalpWRlJPQzlWUlcxRVlVUklZbHBJYjNwTFYySmFLMWQyVFZSaU1TczBOM2NLWVhSWE5FaGhiME5aV21VNEszTk9NWHBpTUZSQk5VWkJUbHBGWTJKQ1N6WTJTSFZrTlhkSlJFRlJRVUpCYjBsQ1FVUlFVRzVNWmxkQmExUmFOR1l2U1FwcmJYZFJUWFp3U21KSFRVeFhZbk41Y3psSlpHTkZNbUV5VUVkeFVrRlVWRXBFWmk4eGVFTTFhVmRaVkhnMlZEWjVTRGsxTnpZME5qQXJha0ZLZVVoaENrb3dTM1pvYzFCWk9IRlZTbmgwYjBaR2EyeHVMM1owT1dVNWVrbDBXWFpSUnpkSVFuVjZOM2RTUzFjNWRrWXdRVmRrWnpkeWNVZE9WVWd4TDBVNU1USUtabk1yUm5WMmRHcGhVV1ZCZFhCT1VEQnVSRFU1VlRoeVIzaG5ZakZpUnpaSkswcGtPVGwwZUhSc1RHSm1ZVVppU0ZaeWRDOXhObk5pVG14TU9IWnFjZ3BzVEZRNGJ6QXhXVEphU1RGbGJrd3hjRzVhYVVOVFkzSXZOV2hGVjFCcFFucERZV04xVGs5SVluQkNSWEJEVDJkMVlrNHpZWGhVY2xVMWJHcG5aSGhQQ2xvM05raEROSGxoUmtSelJqVmFOeTk1TTB4eGMwTnBRWEIxVm5WRVJXMDFVVWd3UlRoMlRIVmhZVFEwTldNemJWb3diMUZJTTB0cFJ6Wm9XV2hKWkdzS1FsVmpTelp0UlVObldVVkJObVV3ZFhaS1EwazBNRmh5VkhWTFp6aDBSbTAxVFZkVFpXRkRXblpIZVdSTFpqUTRRVEZMVmtaV05YbFJkbWhLWkhWWVpRb3ZhekV6ZURaM1NsQkRaM05FZUdSR2QzbFRWVzlGU0VObk4wMWxUek4zZVV4RVJWVldkVFJRUlZVMVVXMWtLMVJNVjJoQ1ZFazRWbEp3VTI1RlJrbHNDbWhWV2s1SFJtZDBVaXRTY2taeGFuQnhjMFJ6Um1wVWNXWkZiR3Q2UlZsUU0xZGxjbXQ1YjFJelowdHlkalJzUzNobFIyaFVRbU5EWjFsRlFUUmpWVWNLVUdFeFVpdDZiVTlRT0hsWWJuUllWMDVJU2toTWJ5dE5WMnRSTDIxMWQwUmFiRlZLV0N0dWEweE1MMEk1YWl0eFpuSjBlR2czTTFONGNEVkxUVnBrV0FwV2RWWkJWVUV6VUVSTFNEQmtObGt5T1RkclZsQm9aVk5MVUM5YVRXdFBlVVpPV0VVMll6bFlabEZtZEhKeFNFWlRXVE4yUld4TlUxQkhOakJZUVVaNUNsSktXVmhJVERGS1FXOW1WbnBpTlRkVVduWlpNVVJsWVRST1EzcDFOSGN6VFM5NlVsUnlSVU5uV1VGNFlWUk5Ua015Tms5eGR6aHZRelJETlhGWVpWWUtZbEpKYVdSTlZHdFpkMFJVYUU5elExQkxhRmMyYVhONVkwTldPRmwwVHpKWVdVTnRaMWhWTVRaeWNHSjFZWFV6Y1ROMGJGZHNOazh5VUM5VGVYTnZRd3BSV2l0MFQxQXlabmg1TkVwUmIzUm5PVkIxVDBFd09GbExTVUZrVmpKNWNtVlJNRUo2YlZwTFNVUndjV1lyVmxSa2QzRnVTMmxuTldSdWN5OUdja1l4Q2t3NVpYazNlR294UkhoV1pVVk5OMnhsTWtwS2IzZExRbWRSUTFBdldqZGlWekV3T0VGNGRFMWhWMjlUVEZsUGRXTXlkMlZ6UVV4ME1YcFdVakF4UkdZS2VGVkNlbGxpVEdKTU0yMHZWMmdyWkUxSFRtRkdZVVZIWlVKSlRubDBOSHBXTkdSTVFqSlBWVkpRTm5ORFQwSndOR2wwUVV4TWVGWldZMlp4Yms4MVNncENORmhPVFZOWk1WbG5ZMlpLTmtkNVNtTnVhVkZCVlZSalpTdHdPVzF2ZDJkRFJrSm1VaTlDWXpKNlZFTmlaVTloWlZaRGFFTjRUbFZuTkhablZpODNDakJxVTFWSlVVdENaMGN5T1M4d1FsWjROa2RwT0RsMVN5OHhjemRwWmk5Q2FsTXJObWxOWm1sNGNWTnpaRWN5U1ZweVpYaHZRbkl2WlRaelVsWnRSRE1LZUUxTE1FdEZTakJ0U0hJd1pGRkNSM00zVTNjMU16VnJjVVJUYjA5RFpFRlhOMlowT1RSQ09DOVFXRmR5VVhKR2JEaDBlR0V4Wm14ak9GUkxLMVJMVFFvMFZsWkdMek5EYTFkWlNtcE5jV3hJTm1RNFEzSnZOMDA1S3poNGVrMDNkelJ1Y1VGd2QydHFUVTgwZFU5UmEwcEZjRkZVQ2kwdExTMHRSVTVFSUZKVFFTQlFVa2xXUVZSRklFdEZXUzB0TFMwdENnPT0iCmN1cnJlbnQtY29udGV4dDogdmFncmFudC1tdWx0aQo="
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: l5d-config
+data:
+  config.yaml: |-
+    admin:
+      port: 9990
+
+    namers:
+    # We have two proxies in our linkerd containers
+    - kind: io.l5d.k8s
+      port: 8001
+      prefix: /internal/io.l5d.k8s
+    - kind: io.l5d.k8s
+      port: 8002
+      prefix: /external/io.l5d.k8s
+      labelSelec
+
+    routers:
+    - protocol: http
+      identifier:
+        kind: io.l5d.http.ingress
+      servers:
+        - port: 80
+          ip: 0.0.0.0
+          clearContext: true
+        - port: 1080
+          ip: 0.0.0.0
+          clearContext: true
+      dtab: |
+        /internal => /#/internal/io.l5d.k8s ;
+        /external => /#/external/io.l5d.k8s ;
+        /svc => /internal | /external ;
+
+    usage:
+      orgId: linkerd-examples-ingress
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    app: l5d
+  name: l5d
+spec:
+  template:
+    metadata:
+      labels:
+        app: l5d
+    spec:
+      hostNetwork: true
+      volumes:
+      - name: l5d-config
+        configMap:
+          name: "l5d-config"
+      - name: etc-kubernetes-kubeconfig
+        secret:
+          secretName: external-kubeconfig
+      containers:
+      # - name: konfd
+      #   image: gcr.io/hightowerlabs/konfd:v0.0.4
+      #   args:
+      #   - -configmap dtab-template
+      #   resources:
+      #     requests:
+      #       cpu: 100m
+      #       memory: 30Mi
+      # - name: l5d-updater
+      #   image: buoyantio/linkerd:0.9.1
+      #   cmd: "bash -c 'while true; do namerctl dtab update default -f /opt/shared/dtab-templated; sleep ${SLEEP_DURATION}; done;"
+      #   env:
+      #   - name: SLEEP_DURATION
+      #     value: "10"
+      - name: l5d
+        image: buoyantio/linkerd:0.9.1
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        args:
+        - /io.buoyant/linkerd/config/config.yaml
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: not-socks
+          containerPort: 1080
+          hostPort: 1080
+        - name: admin
+          containerPort: 9990
+        volumeMounts:
+        - name: "l5d-config"
+          mountPath: "/io.buoyant/linkerd/config"
+          readOnly: true
+
+      - name: kubectl-internal
+        image: buoyantio/kubectl:v1.4.0
+        args: ["proxy", "-p", "8001"]
+      - name: kubectl-external
+        image: buoyantio/kubectl:v1.4.0
+        args: ["proxy", "--kubeconfig", "/etc/kubernetes/kubeconfig", "-p", "8002"]
+        volumeMounts:
+        - name: etc-kubernetes-kubeconfig
+          mountPath: /etc/kubernetes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: l5d
+spec:
+  selector:
+    app: l5d
+  type: NodePort
+  clusterIP: 10.3.0.5
+  ports:
+  - name: http
+    port: 80
+  - name: admin
+    port: 9990
+    nodePort: 30999

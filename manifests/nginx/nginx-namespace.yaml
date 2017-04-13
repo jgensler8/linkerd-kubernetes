@@ -1,0 +1,7 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: edge-gateway
+  labels:
+    name: edge-gateway

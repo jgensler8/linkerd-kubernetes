@@ -1,0 +1,29 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: edge-gateway
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: buoyantio/nginx:1.10.2
+        ports:
+        - name: my-http
+          containerPort: 80
+          # hostPort will be a high level port
+        volumeMounts:
+        - name: etc-nginx-nginx-conf
+          mountPath: "/etc/nginx"
+      volumes:
+      - name: etc-nginx-nginx-conf
+        configMap:
+          name: nginx-config
