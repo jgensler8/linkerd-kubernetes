@@ -32,16 +32,31 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+
+        # These variables are used when only linkerd is used to integrate
+        # - name: GATEWAY_TOKENIZERSERVICE
+        #   value: http://tokenizer/tokenize
+        # - name: GATEWAY_ADDITIONSERVICE
+        #   value: http://addition-operator/operate
+        # - name: GATEWAY_SUBTRACTIONSERVICE
+        #   value: http://subtraction-operator/operate
+        # - name: GATEWAY_MULTIPLICATIONSERVICE
+        #   value: http://multiplication-operator/operate
+        # - name: GATEWAY_DIVISIONSERVICE
+        #   value: http://division-operator/operate
+
+        # These variables are used with Part 3's NGINX Gateway example
         - name: GATEWAY_TOKENIZERSERVICE
-          value: http://tokenizer/tokenize
+          value: http://api.calculator.com/api/tokenizer/tokenize
         - name: GATEWAY_ADDITIONSERVICE
-          value: http://addition-operator/operate
+          value: http://api.calculator.com/api/addition-operator/operate
         - name: GATEWAY_SUBTRACTIONSERVICE
-          value: http://subtraction-operator/operate
+          value: http://api.calculator.com/api/subtraction-operator/operate
         - name: GATEWAY_MULTIPLICATIONSERVICE
-          value: http://multiplication-operator/operate
+          value: http://api.calculator.com/api/multiplication-operator/operate
         - name: GATEWAY_DIVISIONSERVICE
-          value: http://division-operator/operate
+          value: http://division-operator.calculator.com/operate
+
         # These variables would be used if we weren't using linkerd and
         # each service was in its own namespace
         # - name: GATEWAY_TOKENIZERSERVICE

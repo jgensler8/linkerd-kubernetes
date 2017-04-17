@@ -1,0 +1,330 @@
+#cloud-config
+coreos:
+  flannel:
+    # preprod
+    etcd_endpoints: "http://172.17.4.2:2379"
+    interface: 172.17.4.82
+  units:
+  - name: update-engine.service
+    command: stop
+  - name: locksmithd.service
+    command: stop
+  - name: flanneld.service
+    command: start
+  - name: docker.service
+    command: start
+    drop-ins:
+    - name: 40-flannel.conf
+      content: |
+        [Unit]
+        Requires=flanneld.service
+        After=flanneld.service
+  - name: nginx.service
+    command: start
+    content: |
+      [Unit]
+      Description=NGINX container
+      After=docker.service
+      StartLimitIntervalSec=1
+
+      [Service]
+      Restart=always
+      RestartSec=1
+      Environment=NGINX_TAG=1.11.13
+      ExecStartPre=/usr/bin/docker pull nginx:${NGINX_TAG}
+      ExecStartPre=-/usr/bin/docker stop -t 2 nginx
+      ExecStartPre=-/usr/bin/docker rm nginx
+      ExecStart=/usr/bin/docker run \
+        -p 80:80 \
+        -p 443:443 \
+        --name nginx \
+        --net=host \
+        --cap-add net_bind_service \
+        -v /opt/puppet/managed/nginx:/etc/nginx \
+        --rm \
+        nginx:${NGINX_TAG}
+      ExecStop=/usr/bin/docker stop -t 2 nginx
+      ExecStop=-/usr/bin/docker rm nginx
+
+  - name: division-operator.service
+    command: start
+    content: |
+      [Unit]
+      Description=division-operator container
+      After=docker.service
+      StartLimitIntervalSec=1
+
+      [Service]
+      Restart=always
+      RestartSec=1
+      Environment=DIVISION_OPERATOR_TAG=v0.1.1
+      ExecStartPre=/usr/bin/docker pull jgensl2/division-operator:${DIVISION_OPERATOR_TAG}
+      ExecStartPre=-/usr/bin/docker stop -t 2 division-operator
+      ExecStartPre=-/usr/bin/docker rm division-operator
+      ExecStart=/usr/bin/docker run \
+        -p 7000:8000 \
+        --name division-operator \
+        --rm \
+        jgensl2/division-operator:${DIVISION_OPERATOR_TAG} \
+          /a.out \
+          -v=6 \
+          -logtostderr \
+          -port=8000
+      ExecStop=/usr/bin/docker stop -t 2 division-operator
+      ExecStop=-/usr/bin/docker rm division-operator
+
+  # - name: consul-template.service
+  #   command: start
+  #   content: |
+  #     [Unit]
+  #     Description=consul-template container
+  #     After=docker.service
+  #     StartLimitIntervalSec=1
+  #
+  #     [Service]
+  #     Restart=always
+  #     RestartSec=1
+  #     Environment=CONSUL_TEMPLATE_TAG=0.12
+  #     ExecStartPre=/usr/bin/docker pull alterway/consul-template-nginx:${CONSUL_TEMPLATE_TAG}
+  #     ExecStartPre=-/usr/bin/docker stop -t 2 consul-template
+  #     ExecStartPre=-/usr/bin/docker rm consul-template
+  #     ExecStart=/usr/bin/docker run \
+  #       --name consul-template \
+  #       --net=host \
+  #       -e DOMAIN=calculator.com \
+  #       --rm \
+  #       -v /opt/puppet/managed/consul-template:/opt/puppet/managed/consul-template \
+  #       -v /opt/puppet/managed/nginx:/opt/puppet/managed/nginx \
+  #       alterway/consul-template-nginx:${CONSUL_TEMPLATE_TAG} \
+  #         -consul=172.17.4.66:8500 \
+  #         -wait=2s \
+  #         -log-level=err \
+  #         -template="/opt/puppet/managed/consul-template/upstreams.ctmpl:/opt/puppet/managed/nginx/templated/upstreams.conf" \
+  #         -template="/opt/puppet/managed/consul-template/servers.ctmpl:/opt/puppet/managed/nginx/templated/servers.conf"
+  #     ExecStop=/usr/bin/docker stop -t 2 consul-template
+  #     ExecStop=-/usr/bin/docker rm consul-template
+
+  - name: kubectl-sidecar.service
+    command: start
+    content: |
+      [Unit]
+      Description=kubectl-sidecar container for use with linkerd
+      After=docker.service
+      StartLimitIntervalSec=1
+
+      [Service]
+      Restart=always
+      RestartSec=1
+      Environment=KUBECTL_TAG=v1.4.0
+      ExecStartPre=/usr/bin/docker pull buoyantio/kubectl:${KUBECTL_TAG}
+      ExecStartPre=-/usr/bin/docker stop -t 2 kubectl-proxy
+      ExecStartPre=-/usr/bin/docker rm kubectl-proxy
+      ExecStart=/usr/bin/docker run \
+        --name kubectl-proxy \
+        --net=host \
+        --rm \
+        -p 127.0.0.1:8001:8001 \
+        -v /etc/kubernetes/kubeconfig:/etc/kubernetes/kubeconfig \
+        buoyantio/kubectl:${KUBECTL_TAG} \
+          proxy \
+          -p 8001 \
+          --kubeconfig /etc/kubernetes/kubeconfig
+      ExecStop=/usr/bin/docker stop -t 2 kubectl-proxy
+      ExecStop=-/usr/bin/docker rm kubectl-proxy
+
+  - name: linkerd.service
+    command: start
+    content: |
+      [Unit]
+      Description=linkerd container
+      After=docker.service
+      StartLimitIntervalSec=1
+
+      [Service]
+      Restart=always
+      RestartSec=1
+      Environment=LINKERD_TAG=0.9.1
+      ExecStartPre=/usr/bin/docker pull buoyantio/linkerd:${LINKERD_TAG}
+      ExecStartPre=-/usr/bin/docker stop -t 2 linkerd
+      ExecStartPre=-/usr/bin/docker rm linkerd
+      ExecStart=/usr/bin/docker run \
+        --name linkerd \
+        --rm \
+        --net=host \
+        -v /opt/puppet/managed/linkerd/config.yaml:/io.buoyant/linkerd/config/config.yaml \
+        buoyantio/linkerd:${LINKERD_TAG} \
+          /io.buoyant/linkerd/config/config.yaml
+      ExecStop=/usr/bin/docker stop -t 2 linkerd
+      ExecStop=-/usr/bin/docker rm linkerd
+
+  # - name: kube-proxy.service
+  #   command: start
+  #   content: |
+  #     [Unit]
+  #     Description=kube-proxy container
+  #     After=docker.service
+  #     StartLimitIntervalSec=1
+  #
+  #     [Service]
+  #     Restart=always
+  #     RestartSec=1
+  #     Environment=HYPERKUBE_TAG=v1.5.4_coreos.0
+  #     ExecStartPre=/usr/bin/docker pull quay.io/coreos/hyperkube:${HYPERKUBE_TAG}
+  #     ExecStartPre=-/usr/bin/docker stop -t 2 kube-proxy
+  #     ExecStartPre=-/usr/bin/docker rm kube-proxy
+  #     ExecStart=/usr/bin/docker run \
+  #       --name kube-proxy \
+  #       --rm \
+  #       --net=host \
+  #       -v /var/run/dbus:/var/run/dbus \
+  #       -v /etc/kubernetes/kubeconfig:/etc/kubernetes/kubeconfig \
+  #       quay.io/coreos/hyperkube:${HYPERKUBE_TAG} \
+  #         /hyperkube \
+  #         proxy \
+  #         --kubeconfig /etc/kubernetes/kubeconfig \
+  #         --cluster-cidr=10.2.0.0/16
+  #     ExecStop=/usr/bin/docker stop -t 2 kube-proxy
+  #     ExecStop=-/usr/bin/docker rm kube-proxy
+
+write_files:
+- path: /opt/puppet/managed/nginx/nginx.conf
+  permissions: 0644
+  owner: root
+  content: |
+    # THIS FILE IS MANAGED BY PUPPET OR ANSIBLE OR CHEF
+    # :)
+    events {
+      worker_connections  1024;
+    }
+    http {
+      server {
+        listen 80;
+        server_name division-operator.calculator.com;
+        location / {
+          proxy_pass       http://172.17.4.82:7000;
+          proxy_set_header Host            $host;
+          proxy_set_header X-Forwarded-For $remote_addr;
+        }
+      }
+
+      # include templated/upstreams.conf;
+      # include templated/servers.conf;
+
+      include linkerd.conf;
+      include linkerd-B.conf;
+    }
+
+- path: /opt/puppet/managed/consul-template/upstreams.ctmpl
+  permissions: 0644
+  owner: root
+  content: |
+    {{ range $service := services }}
+    upstream {{ $service.Name }} { {{ range $s := service $service.Name }}
+        server {{ $s.Address }}:{{ $s.Port }};{{ end }}
+    }{{ end }}
+
+- path: /opt/puppet/managed/nginx/linkerd.conf
+  permissions: 0644
+  owner: root
+  content: |
+    upstream linkerd {
+      server localhost:4140;
+    }
+
+- path: /opt/puppet/managed/nginx/linkerd-B.conf
+  permissions: 0644
+  owner: root
+  content: |
+    server {
+      listen 80;
+
+      server_name api.calculator.com;
+
+      location /api/ {
+        rewrite /api/([^/]+)/(.*) /$2  break;
+        proxy_pass http://linkerd;
+        proxy_set_header Host            $1;
+        proxy_set_header X-Forwarded-For $remote_addr;
+      }
+    }
+
+- path: /opt/puppet/managed/consul-template/servers.ctmpl
+  permissions: 0644
+  owner: root
+  content: |
+    server {
+      listen 80;
+
+      server_name api.calculator.com;
+
+      {{ range $service := services }}
+      location /api/{{ $service.Name }}/ {
+        rewrite ^(/api/{{ $service.Name }})/(.*) /$2  break;
+        proxy_pass http://{{ $service.Name }};
+        proxy_set_header Host            $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+      }{{end}}
+
+      location /api/ {
+        rewrite /api/([^/]+)/(.*) /$2  break;
+        proxy_pass http://linkerd;
+        proxy_set_header Host            $1;
+        proxy_set_header X-Forwarded-For $remote_addr;
+      }
+    }
+
+- path: /opt/puppet/managed/linkerd/config.yaml
+  permissions: 0644
+  owner: root
+  content: |
+    admin:
+      port: 9990
+    namers:
+    - kind: io.l5d.k8s
+      port: 8001
+    - kind: io.l5d.consul
+      host: 172.17.4.66
+      port: 8500
+      # includeTag: true
+      # useHealthCheck: true
+      # setHost: true
+      # consistencyMode: stale
+    routers:
+    - protocol: http
+      identifier:
+        kind: io.l5d.http.ingress
+      dtab: |
+        /consul => /#/io.l5d.consul/dc1 ;
+        /consulslicer/*/* => /consul ;
+        /kubernetes => /#/io.l5d.k8s ;
+        /svc => /consulslicer | /kubernetes ;
+      servers:
+      - port: 4140
+        ip: 127.0.0.1
+        clearContext: true
+    usage:
+      orgId: linkerd-examples-ingress
+
+- path: /etc/kubernetes/kubeconfig
+  permissions: 0644
+  owner: root
+  content: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - cluster:
+        certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURHakNDQWdLZ0F3SUJBZ0lKQUo3a1RZaUdqOWZvTUEwR0NTcUdTSWIzRFFFQkJRVUFNQkl4RURBT0JnTlYKQkFNVEIydDFZbVV0WTJFd0hoY05NVGN3TkRBNE1UWXlPVE0xV2hjTk5EUXdPREkwTVRZeU9UTTFXakFTTVJBdwpEZ1lEVlFRREV3ZHJkV0psTFdOaE1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBCms2NHM1YnAzY1BSSGhkR2RrNFBPK2d5dzczSjRoVnRYSitFU3REWjVjL1pBZjkyZVFuZGZkYzNxckpjQk9QRDQKdnRzN3VTYjdGYU5pVzJCVklsTmFHZ2tCeEVHY3BWY1Zva2FhaVBpVXIzWGFXaHF1MVd3NkxmS2VlSzl6YXFQUgpQL1hsZ3QwK0hLMThFeTU4c1U5aTU1SjBvajVlak1Scy9GWlo0MWx6R01hdlNpTTFhM0N0dHdJekUyRzFJYk1sCmVZbURvbFVFdWR3cHNlcEl0WThkWFltWXU5ZmpiRzRoVGs5Tk1PU2g2aUF0dUlocE01dmRDZ1RJUmxBbkdkMVcKNmNkVVNZUlhSVkFpWitoWDhFWGlJTTdZRkluaEdxVFFHZThEbUQvSVNzQmxxSzVhWGJCblhpZnpHeEZtdkkxdwpxV3plNDBtS2RacDR4eDcvdGdYSjl3SURBUUFCbzNNd2NUQWRCZ05WSFE0RUZnUVU5VjF0b243NGVod2QzU2MvClpWMG1rWmh1ZitRd1FnWURWUjBqQkRzd09ZQVU5VjF0b243NGVod2QzU2MvWlYwbWtaaHVmK1NoRnFRVU1CSXgKRURBT0JnTlZCQU1UQjJ0MVltVXRZMkdDQ1FDZTVFMkloby9YNkRBTUJnTlZIUk1FQlRBREFRSC9NQTBHQ1NxRwpTSWIzRFFFQkJRVUFBNElCQVFBY3ozZmU5TUNmYWhMaFdKL2NzUzI2ODJYalozSVhzWFJOTWtrTGk4ZlkvMTBvCnU1Y2ZUODhqS1Z2SHlNQzE4K3k2a1dlWDdzSU9JWmlXUUNrcGRmY2NpcGQ1UVlIOUpSdklDM0ttL0ZKNDJwUHYKbHRIRElMWVRwMUcxdmVMeXdjWVQxRngrOStCLy9taHNETndMTEp5eHphS1dMc3RXOXJqa3k0OGNaWXRWeXBsNApvazFldWpNVUg1OWpMeWpMQzZQcEhrSlRySDQrMjhWRDRncDVEWkh2UjNvRk9mR3pNTTlxK2R6eWxzajBiUmVJCi9KUm9SZmIvdnRZamxnWTc4RnhIUllWOGFJRmcrYzVBTUlPbWo2NVBQRjJhUmtIc3ZkeHdHcGQxUUFXTEdYS1MKNmZoZ3RQa2laKzBFZDVCeTlSQnQrSTk3a3ZCbmtkSktlS1NmdVVvcgotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+        server: https://172.17.4.3:443
+      name: vagrant-multi-cluster
+    contexts:
+    - context:
+        cluster: vagrant-multi-cluster
+        namespace: default
+        user: vagrant-multi-admin
+      name: vagrant-multi
+    users:
+    - name: vagrant-multi-admin
+      user:
+        client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURMekNDQWhlZ0F3SUJBZ0lKQU5iMk9OaHcrb3hPTUEwR0NTcUdTSWIzRFFFQkJRVUFNQkl4RURBT0JnTlYKQkFNVEIydDFZbVV0WTJFd0hoY05NVGN3TkRBNE1UWXpOakF5V2hjTk1UZ3dOREE0TVRZek5qQXlXakFWTVJNdwpFUVlEVlFRRERBcHJkV0psTFdGa2JXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDCkFRRUF5M2NrNDUxUmo1NitOOU1hZUJ2N3lQTG5Xd2NxbTdIbXNLM3JzM1BXZzYzLzFib0JQY0E0aEpIVVYxQjgKODhSazRKTkViR1hIUkI4NXl6TXNyYzRybmZCN3lRR0hFRERjYnptWE5rZXFxb2FJMWNObENvQzBUVTZmaEFONgpFcUZJVjB0eEw5TEVyMEd6VXNuQzBBcUZkT0dZMVB5N2VUR2JHN2c1dnNyUWdhZ0thd1lSa09EZXluM0NCSWpSCjgxd0JKUVAzOHRnWUR1ajJkTkNvNURJL09DQmpXUnJmcGJJMUF0VnY1SnZxOUVHMFNheUkxOThtbGxqTG1sbVYKTmpNYVJidTVJcjJYdjRLTHNhQU5PdDM2TGNNQW5IN0NtbTlTRTVyRU1XckZ0VXYzVTdlNGVnNnJjeVl2U3k4Lwo0S00rcjZLUENHVC9ZY0NpTVR6WTVwS1VwUUlEQVFBQm80R0VNSUdCTUFrR0ExVWRFd1FDTUFBd0N3WURWUjBQCkJBUURBZ1hnTUdjR0ExVWRFUVJnTUY2Q0NtdDFZbVZ5Ym1WMFpYT0NFbXQxWW1WeWJtVjBaWE11WkdWbVlYVnMKZElJV2EzVmlaWEp1WlhSbGN5NWtaV1poZFd4MExuTjJZNElrYTNWaVpYSnVaWFJsY3k1a1pXWmhkV3gwTG5OMgpZeTVqYkhWemRHVnlMbXh2WTJGc01BMEdDU3FHU0liM0RRRUJCUVVBQTRJQkFRQ1BjTjZnQzZIbFo0Wng5R2NXCkp5Y1J0R05mc2tuTnlBeTRseXcxV0tGdlBsNGROcjg3MjlWRnc3MmRXM2MzbTQvTzkzQ1FGeXF1Y2xOS0YwL1MKeDYvR00yNEwwdVRPaWxuekpnMEM4Y3RRT0YwN0szcVFvQmNTU1FaRHZKQW93UitkN1hkUTQveFRIWVE4NUEwQgpWY016Y2FaU1dFNExZbW1TQ2E1QXowalNSQi9WZG9FZzVUOWgvejVoTUVjRDFqbXE0TTdRbHpMVm5oV3g2WHo2ClZtWXY3YllSVEg3b29NTjhyazYra3JDQkljb1ZvUElmV2NpTVBSRGRId2Z1M0dyOXpGd0RWTFhtQ1h6T3FGazAKMnZJQUl0eHNaM1pxK1ZjUmFqcnhDc1ZNNmlFcDVtd2tNYUpYMERLTWdTVHltUElWSEE0S1Vjb2VvR1VMSEZBdgplOHRXCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+        client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBeTNjazQ1MVJqNTYrTjlNYWVCdjd5UExuV3djcW03SG1zSzNyczNQV2c2My8xYm9CClBjQTRoSkhVVjFCODg4Ums0Sk5FYkdYSFJCODV5ek1zcmM0cm5mQjd5UUdIRUREY2J6bVhOa2VxcW9hSTFjTmwKQ29DMFRVNmZoQU42RXFGSVYwdHhMOUxFcjBHelVzbkMwQXFGZE9HWTFQeTdlVEdiRzdnNXZzclFnYWdLYXdZUgprT0RleW4zQ0JJalI4MXdCSlFQMzh0Z1lEdWoyZE5DbzVESS9PQ0JqV1JyZnBiSTFBdFZ2NUp2cTlFRzBTYXlJCjE5OG1sbGpMbWxtVk5qTWFSYnU1SXIyWHY0S0xzYUFOT3QzNkxjTUFuSDdDbW05U0U1ckVNV3JGdFV2M1U3ZTQKZWc2cmN5WXZTeTgvNEtNK3I2S1BDR1QvWWNDaU1Uelk1cEtVcFFJREFRQUJBb0lCQUYzQ01ZV1I0UnZGa3ZJMgpuV1Byd1VNQWJBeE9hUndHQnNBejVRRjB4ODAyU1VZN3lJYWtKV2N4ckIvd1B5UTF4Q2FZdGxjZEw0Mzh0YTBsCmo5a253SUd2Wjl0Z2tOU3RMMmN4cXJTZ29jeWk0anRmSnhpSDVvNFpSUGlZZ1pCRU1nbklBZ2gvbjVNRE81ZFMKMGlyOExqT0dJZDlEOTBBSjArZ2FKTUgrdzhaNnpyb01YZ3VYT0FpTGZOTmdLVXdyWUYrSGlEUXNibXd5MmpMZwpPTVdveDlXKytDTS8yUFN6cVpnQ3A2OXgzUEJZSVc5MFVGbEZvdm9nQ3Q5YzBVT2ZONmNITDNhQTZjeFV1OERwCkorR2lGOFhJaDVEUXJnRkpRRUJkckthSFh5R1BscGR4amQzWlRyV1Bzc0ZwTHBrRnBRVHV2T2QwS1prNWFmN0YKY1oyYkJhRUNnWUVBNWFsc2xtUlpFeWRFNlh4Mnp5V3V1aU5GOEF1Y3RtS2R2SnZHWk9lQnJjbUV1a3ZGem9uTwp3OFh2L2RiQUZHZElPdGwzYUhBSlI3RFZkcGdPRW9rNDhmODNFelJjYjFJell6a0lWOHQ4ZHhmdVFvSDJOd0o2CktXVjdDM2p2UWRIb1plTlB5WmxlaFBDd21HWStqTnAwUnYyTGhwOTFrU2UvcDB3WnhQVkJnNzhDZ1lFQTRzeWcKaUhkSkNVaDAwUElvYXY5cHcyd0NMOUNLNS9ER21DRWJRWkJQRW0ySWZKMWUzVUtTU0dIakV4aVBjUlRVK1p5QwpiOVpCTDJUNmsxWHB0MjZFRUh6SG1BeDhhclNHNXFTaFprV1hKRGEzOGFHZU1DbXlqVTJrTUU5Vjl6dWdaWURpCk9jQUNLdHY4OGRNQStZaForb1dqdTRZRXlJS0tOWjcwSlozTU1Kc0NnWUIxZERHSnRLWnRpajdQSG8xd29YZjcKMEVCYlpNVHY3ZjEzMFQ4a3FkV0RlTFY5eFhUVGpWMEdlTHVsV1dnQXgxV0VhMldMTHdrLzllc2w3TnY5bE5wZgp3VU44ZWVId09OejVHTmp3ZGF3aENFY2RFblJHYStqb05QTTV5YzZySGR3NkI0ZnR0WmRHYkFZVTJ1MlFnY1RICjdiR20xdlI4bVJTR1RnQTczNlp5NXdLQmdRREdWQ2IxNzBvaElnbDFScTN0azFrTG1ZSDRDaWZPV0JGeXExREkKYnNlVzE4NEpHeHovNDkxRUNzV2x4MDU0bHJ6L1lzdjF2S2pZSnpld2ErcXJpNnRWTjZqYTMrQlU5M1VZY0ZMcgp1bU5IT2NwMU5OMitSRmh0bEwzRnVUcjFybUMvSW91eDhLUjBrbGVKcVBrclBQOWlRa2RDRHhwVHRVUGpUQk00CmFkdExqUUtCZ0gvY2w4YlNEdFZtSzBXR1Y0NEFtcnF6ZmszQk90Q0s5TzhwMEdjdzcxY0tQUVJyR2VraWN0VlEKeVN3em9mdkZ2cXd2T2wycFhERjduR0JvYy94Mi9CVG1WQ2xVSlpaS0ZYaVA4T2tQQU4yVWFTTEs0QnZIejBjUApzUXM4NWdKeWh3VHJSM2pBVXorbE9tODFWWkVtekVWV3dPMU0wOWIzaS9Ic2xXejJOSmNaCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+    current-context: vagrant-multi

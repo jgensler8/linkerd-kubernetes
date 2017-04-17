@@ -1,23 +1,28 @@
-{{- $root := . -}}
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: "{{ $root.serviceName }}"
-  namespace: "{{ $root.teamName }}"
+  name: edge-gateway
   annotations:
     kubernetes.io/ingress.class: "linkerd"
   labels:
-    app: "{{ $root.serviceName }}"
-    environment: "{{ $root.environment }}"
+    app: edge-gateway
+    environment: preprod
 spec:
   rules:
-  - host: "{{ $root.serviceName }}"
+  - host: api.calculator.com
     http:
       paths:
       - backend:
-          serviceName: "{{ $root.serviceName }}"
-          servicePort: "{{ $root.portName }}"
+          serviceName: nginx
+          servicePort: my-http
+  # This represents all host values that exist in the Puppet/Chef/Ansible config
+  - host: division-operator.calculator.com
+    http:
+      paths:
+      - backend:
+          serviceName: nginx
+          servicePort: my-http
   # The following config would be used without any rewrite in NGINX.
   # If you use the following, you will end up with a 404 from Go rather than NGINX.
   # We would have to use path to identify us but linkerd doesn't support rewrites *in Ingress objects*

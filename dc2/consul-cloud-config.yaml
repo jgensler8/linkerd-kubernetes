@@ -1,0 +1,105 @@
+#cloud-config
+coreos:
+  flannel:
+    # preprod
+    etcd_endpoints: "http://172.17.4.2:2379"
+  units:
+  - name: update-engine.service
+    command: stop
+  - name: locksmithd.service
+    command: stop
+  - name: flanneld.service
+    command: start
+  - name: docker.service
+    command: start
+    drop-ins:
+    - name: 40-flannel.conf
+      content: |
+        [Unit]
+        Requires=flanneld.service
+        After=flanneld.service
+  - name: consul.service
+    command: start
+    content: |
+      [Unit]
+      Description=consul container
+      After=docker.service
+      StartLimitIntervalSec=1
+
+      [Service]
+      Restart=always
+      RestartSec=1
+      Environment=CONSUL_TAG=0.8.0
+      ExecStartPre=/usr/bin/docker pull consul:${CONSUL_TAG}
+      ExecStartPre=-/usr/bin/docker stop -t 2 consul
+      ExecStartPre=-/usr/bin/docker rm consul
+      ExecStart=/usr/bin/docker run \
+        -p 8600:8600/tcp \
+        -p 8600:8600/udp \
+        -p 8500:8500 \
+        -p 8400:8400 \
+        -p 8301:8301/tcp \
+        -p 8301:8301/udp \
+        -p 8302:8302/tcp \
+        -p 8302:8302/udp \
+        -p 8300:8300 \
+        --name consul \
+        --net=host \
+        --rm \
+        consul:${CONSUL_TAG}
+      ExecStop=/usr/bin/docker stop -t 2 consul
+      ExecStop=-/usr/bin/docker rm consul
+
+  - name: registrator.service
+    command: start
+    content: |
+      [Unit]
+      Description=registrator container
+      After=docker.service
+      StartLimitIntervalSec=1
+
+      [Service]
+      Restart=always
+      RestartSec=1
+      Environment=REGISTRATOR_TAG=v7
+      ExecStartPre=/usr/bin/docker pull gliderlabs/registrator:${REGISTRATOR_TAG}
+      ExecStartPre=-/usr/bin/docker stop -t 2 registrator
+      ExecStartPre=-/usr/bin/docker rm registrator
+      ExecStart=/usr/bin/docker run \
+        --name registrator \
+        --net=host \
+        -v /var/run/docker.sock:/tmp/docker.sock \
+        --rm \
+        gliderlabs/registrator:${REGISTRATOR_TAG} \
+        -tags="internal,external" \
+        -ip="172.17.4.66" \
+        consul://172.17.4.66:8500
+      ExecStop=/usr/bin/docker stop -t 2 registrator
+      ExecStop=-/usr/bin/docker rm registrator
+
+  - name: addition-operator.service
+    command: start
+    content: |
+      [Unit]
+      Description=addition-operator container
+      After=docker.service
+      StartLimitIntervalSec=1
+
+      [Service]
+      Restart=always
+      RestartSec=1
+      Environment=ADDITION_OPERATOR_TAG=v0.1.1
+      ExecStartPre=/usr/bin/docker pull jgensl2/addition-operator:${ADDITION_OPERATOR_TAG}
+      ExecStartPre=-/usr/bin/docker stop -t 2 addition-operator
+      ExecStartPre=-/usr/bin/docker rm addition-operator
+      ExecStart=/usr/bin/docker run \
+        -p 7000:8000 \
+        --name addition-operator \
+        --rm \
+        jgensl2/addition-operator:${ADDITION_OPERATOR_TAG} \
+          /a.out \
+          -v=6 \
+          -logtostderr \
+          -port=8000
+      ExecStop=/usr/bin/docker stop -t 2 addition-operator
+      ExecStop=-/usr/bin/docker rm addition-operator

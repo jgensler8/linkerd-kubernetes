@@ -55,3 +55,5 @@ A Pod IP.
 * Orlando: prod (/28 [16-31])
 * Tokyo: preprod (/28 [32-47])
 * Tokyo: prod (/28 [48-63])
+* DC1: preprod (/28 [64-79])
+* DC2: preprod (/28 [80-95])

@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  # Linkerd Ingress controller doesn't support ExternalName services ...
+  # type: ExternalName
+  # externalName: api.calculator.com
+  # ... so we will actually forward back to linkerd but use the methodAndHost
+  # Identifier and resolve to the NGINX IP address
+  type: NodePort
+  ports:
+  - name: my-http
+    targetPort: nginx-redirect
+    port: 4141
+    nodePort: 30141
+  selector:
+    app: l5d

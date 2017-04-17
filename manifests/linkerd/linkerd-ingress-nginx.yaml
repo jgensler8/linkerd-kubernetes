@@ -1,0 +1,156 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: l5d-config
+data:
+  config.yaml: |-
+    admin:
+      port: 9990
+
+    namers:
+    # Back to one proxy!
+    - kind: io.l5d.k8s
+      port: 8001
+      prefix: /internal/io.l5d.k8s
+      # labelSelector: linkerd-expose-internal
+    - kind: io.l5d.k8s
+      port: 8001
+      prefix: /external/io.l5d.k8s
+      labelSelector: linkerd-expose-external
+    - kind: io.l5d.consul
+      host: 172.17.4.66
+      port: 8500
+      # includeTag: true
+      # useHealthCheck: true
+      # setHost: true
+      # consistencyMode: stale
+
+    routers:
+    - protocol: http
+      label: http-for-everything
+      identifier:
+        kind: io.l5d.http.ingress
+      servers:
+        - port: 80
+          ip: 0.0.0.0
+          clearContext: true
+        - port: 1080
+          ip: 0.0.0.0
+          clearContext: true
+      dtab: |
+        /consul => /#/io.l5d.consul/dc1 ;
+        /consulslicer/*/* => /consul ;
+        /internal => /#/internal/io.l5d.k8s ;
+        /external => /#/external/io.l5d.k8s ;
+        /svc => /internal | /external | /consulslicer;
+
+    - protocol: http
+      label: http-for-nginx
+      identifier:
+        kind: io.l5d.methodAndHost
+      servers:
+        - port: 4141
+          ip: 0.0.0.0
+          clearContext: true
+      dtab: |
+        /svc/*/*/* => /$/inet/172.17.4.82/80
+
+    - protocol: http
+      label: http-for-external
+      identifier:
+        kind: io.l5d.http.ingress
+      servers:
+        - port: 81
+          ip: 0.0.0.0
+          clearContext: true
+      dtab: |
+        /external => /#/external/io.l5d.k8s ;
+        /fix/applications/first-thing/mydeployment => /external/applications/first-thing/mydeployment/on ;
+        /svc => /fix | /external ;
+
+    usage:
+      orgId: linkerd-examples-ingress
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    app: l5d
+  name: l5d
+spec:
+  template:
+    metadata:
+      labels:
+        app: l5d
+    spec:
+      hostNetwork: true
+      volumes:
+      - name: l5d-config
+        configMap:
+          name: "l5d-config"
+      containers:
+      # - name: konfd
+      #   image: gcr.io/hightowerlabs/konfd:v0.0.4
+      #   args:
+      #   - -configmap dtab-template
+      #   resources:
+      #     requests:
+      #       cpu: 100m
+      #       memory: 30Mi
+      # - name: l5d-updater
+      #   image: buoyantio/linkerd:0.9.1
+      #   cmd: "bash -c 'while true; do namerctl dtab update default -f /opt/shared/dtab-templated; sleep ${SLEEP_DURATION}; done;"
+      #   env:
+      #   - name: SLEEP_DURATION
+      #     value: "10"
+      - name: l5d
+        image: buoyantio/linkerd:0.9.1
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        args:
+        - /io.buoyant/linkerd/config/config.yaml
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: edge-http
+          containerPort: 81
+          hostPort: 81
+        - name: not-socks
+          containerPort: 1080
+          hostPort: 1080
+        - name: nginx-redirect
+          containerPort: 4141
+          hostPort: 4141
+        - name: admin
+          containerPort: 9990
+        volumeMounts:
+        - name: "l5d-config"
+          mountPath: "/io.buoyant/linkerd/config"
+          readOnly: true
+
+      - name: kubectl-internal
+        image: buoyantio/kubectl:v1.4.0
+        args: ["proxy", "-p", "8001"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: l5d
+spec:
+  selector:
+    app: l5d
+  type: NodePort
+  clusterIP: 10.3.0.5
+  ports:
+  - name: http
+    port: 80
+  - name: edge-http
+    port: 81
+  - name: admin
+    port: 9990
+    nodePort: 30999
