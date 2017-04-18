@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-ingress
+  namespace: edge-gateway
+  labels:
+    app: nginx-ingress
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress
+    spec:
+      containers:
+      - image: nginxdemos/nginx-ingress:0.8.0
+        imagePullPolicy: Always
+        name: nginx-ingress
+        ports:
+        - name: my-http
+          containerPort: 80
+        # - containerPort: 443
+        #   hostPort: 443
+        # Uncomment the lines below to enable extensive logging and/or customization of
+        # NGINX configuration with configmaps
+        args:
+         - -v=1
+         - -nginx-configmaps=edge-gateway/nginx-config

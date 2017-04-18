@@ -1,0 +1,26 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+  namespace: edge-gateway
+data:
+  http-snippets: |
+    upstream linkerd {
+      # Remember, we have set edge-routing in the previous demo
+      server 10.3.0.5:80;
+      # ... or we could choose our external rule linkerd server!
+      # server 10.3.0.5:81;
+    }
+
+    server {
+      listen 80;
+
+      server_name api.calculator.com;
+
+      location /api/ {
+        rewrite /api/([^/]+)/(.*) /$2  break;
+        proxy_pass http://linkerd;
+        proxy_set_header Host            $1;
+        proxy_set_header X-Forwarded-For $remote_addr;
+      }
+    }

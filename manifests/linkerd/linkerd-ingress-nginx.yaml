@@ -54,7 +54,8 @@ data:
           ip: 0.0.0.0
           clearContext: true
       dtab: |
-        /svc/*/*/* => /$/inet/172.17.4.82/80
+        /svc/*/*/* => /$/inet/127.0.0.1/31111 ;
+        /svc/*/*/division-operator.calculator.com => /$/inet/172.17.4.82/7000 ;
 
     - protocol: http
       label: http-for-external
@@ -65,9 +66,11 @@ data:
           ip: 0.0.0.0
           clearContext: true
       dtab: |
+        /consul => /#/io.l5d.consul/dc1 ;
+        /consulslicer/*/* => /consul ;
         /external => /#/external/io.l5d.k8s ;
         /fix/applications/first-thing/mydeployment => /external/applications/first-thing/mydeployment/on ;
-        /svc => /fix | /external ;
+        /svc => /fix | /external | /consulslicer;
 
     usage:
       orgId: linkerd-examples-ingress
@@ -151,6 +154,8 @@ spec:
     port: 80
   - name: edge-http
     port: 81
+  - name: nginx-redirect
+    port: 4141
   - name: admin
     port: 9990
     nodePort: 30999

@@ -1,0 +1,19 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "division-operator"
+  # namespace: "team-division-operator"
+  labels:
+    app: "division-operator"
+    environment: "preprod"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: division-operator.calculator.com
+    http:
+      paths:
+      - backend:
+          serviceName: division-operator
+          servicePort: my-http
